@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beautiful Universe Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      color: #fff;
+    }
+    body {
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .stars, .falling-stars, .snow-stars {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .moon {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      width: 10rem;
+      height: 10rem;
+      z-index: 2;
+      filter: drop-shadow(0 0 60px #fffbe6cc);
+    }
+    .moon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+    .shayari-card {
+      background: linear-gradient(135deg, #23243a88 60%, #3a2c4d 100%);
+      border-radius: 1.75rem;
+      box-shadow: 0 8px 40px 0 rgba(80, 120, 255, 0.18), 0 2px 8px #0004;
+      border: 1.5px solid rgba(255,255,255,0.13);
+      padding: 1.5rem 1rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      margin-top: 2rem;
+      animation: fadeIn 2.2s 0.5s backwards;
+    }
+    .shayari-card::before {
+      content: "\201C";
+      font-size: 2.5rem;
+      color: #fffbe6cc;
+      position: absolute;
+      left: 1.5rem;
+      top: 1.25rem;
+      opacity: 0.3;
+    }
+    .shayari-card::after {
+      content: "\201D";
+      font-size: 2.5rem;
+      color: #fffbe6cc;
+      position: absolute;
+      right: 1.5rem;
+      bottom: 0.75rem;
+      opacity: 0.7;
+    }
+    .quote {
+      font-family: 'Georgia', serif;
+      font-size: 1.3rem;
+      color: #ffe9b3;
+      line-height: 1.6;
+      text-shadow: 0 2px 12px #0007;
+    }
+    .author {
+      font-size: 1rem;
+      color: #bdbb9a;
+      font-style: italic;
+      letter-spacing: 1px;
+      margin-top: 0.75rem;
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      .moon {
+        width: 6rem;
+        height: 6rem;
+        right: 1rem;
+        top: 1rem;
+      }
+      .shayari-card {
+        padding: 1.25rem 0.75rem;
+        margin-top: 1rem;
+        max-width: 95vw;
+      }
+      .quote {
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+    }
+  </style>
+</head>
+<body>
+<audio id="bg-music" controls autoplay loop >
+  <source src="1.mp3" type="audio/mpeg">
+</audio>
+
+
+  <canvas class="stars"></canvas>
+  <canvas class="falling-stars"></canvas>
+  <canvas class="snow-stars"></canvas>
+
+  <div class="moon">
+    <svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="80" fill="#fffbe6"/></svg>
+  </div>
+
+  <div class="content">
+    <div class="shayari-card relative">
+      <img src="2.jpg" alt="Shaan's Pic" class="w-34 h-34 sm:w-38 sm:h-38 rounded-full border-4 border-white/20 shadow-lg object-cover mx-auto mb-4">
+      <div class="quote">
+
+        Kon kehta hai tum chashme 👀 mein battery lagti ho 🤓<br>
+Tum to noor lagti ho... ✨🌙<br>
+Arre hatao sona chandi ki baatein 💍<br>
+Tum to Kohinoor lagti ho...💎🥺❤️
+
+       
+        
+        <span class="author">~ Shaan ✍️</span>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+
+      window.addEventListener("DOMContentLoaded", () => {
+    const audio = document.getElementById("bg-music");
+
+    // Try autoplay after small delay
+    setTimeout(() => {
+      const playPromise = audio.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("Autoplay started ✅");
+          })
+          .catch((error) => {
+            console.log("Autoplay blocked 😢");
+
+            // Wait for first click
+            document.body.addEventListener("click", () => {
+              audio.play();
+              console.log("Audio started after user click ✅");
+            }, { once: true });
+          });
+      }
+    }, 1000);
+  });
+    // Animation scripts stay unchanged
+      function setupCanvasAnimation(canvas, drawCallback, resizeCallback) {
+      const ctx = canvas.getContext('2d');
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if (resizeCallback) resizeCallback();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      function animate() {
+        drawCallback(ctx, canvas);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    setupCanvasAnimation(document.querySelector('.stars'), (ctx, canvas) => {
+      if (!ctx.stars) {
+        ctx.stars = Array.from({ length: 200 }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.2 + 0.3,
+          alpha: Math.random() * 0.5 + 0.5,
+          twinkle: Math.random() * 0.03 + 0.01
+        }));
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let s of ctx.stars) {
+        ctx.save();
+        ctx.globalAlpha = s.alpha;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+        s.alpha += (Math.random() - 0.5) * s.twinkle;
+        s.alpha = Math.max(0.2, Math.min(1, s.alpha));
+      }
+    });
+
+    setupCanvasAnimation(document.querySelector('.falling-stars'), (ctx, canvas) => {
+      if (!ctx.meteors) ctx.meteors = [];
+      if (ctx.meteors.length < 25 && Math.random() < 0.5) {
+        ctx.meteors.push({
+          x: Math.random() * canvas.width,
+          y: -20,
+          len: Math.random() * 100 + 80,
+          speed: Math.random() * 6 + 4,
+          angle: Math.PI / 2.5 + (Math.random() - 0.5) * 0.3,
+          alpha: 1
+        });
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = ctx.meteors.length - 1; i >= 0; i--) {
+        let m = ctx.meteors[i];
+        let dx = Math.cos(m.angle) * m.len;
+        let dy = Math.sin(m.angle) * m.len;
+        ctx.save();
+        ctx.globalAlpha = m.alpha;
+        let grad = ctx.createLinearGradient(m.x, m.y, m.x + dx, m.y + dy);
+        grad.addColorStop(0, "#fff");
+        grad.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(m.x + dx, m.y + dy);
+        ctx.stroke();
+        ctx.restore();
+        m.x += Math.cos(m.angle) * m.speed;
+        m.y += Math.sin(m.angle) * m.speed;
+        m.alpha -= 0.012;
+        if (m.alpha <= 0 || m.x > canvas.width || m.y > canvas.height) {
+          ctx.meteors.splice(i, 1);
+        }
+      }
+    });
+
+    setupCanvasAnimation(document.querySelector('.snow-stars'), (ctx, canvas) => {
+      if (!ctx.snowStars) {
+        ctx.snowStars = Array.from({ length: 90 }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.5 + 0.5,
+          speed: Math.random() * 1.5 + 0.5,
+          drift: (Math.random() - 0.5) * 0.6,
+          alpha: Math.random() * 0.5 + 0.5
+        }));
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let s of ctx.snowStars) {
+        ctx.save();
+        ctx.globalAlpha = s.alpha;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+
+        s.y += s.speed;
+        s.x += s.drift;
+        if (s.y > canvas.height + 5 || s.x < -5 || s.x > canvas.width + 5) {
+          s.x = Math.random() * canvas.width;
+          s.y = Math.random() * -20;
+          s.r = Math.random() * 1.5 + 0.5;
+          s.speed = Math.random() * 1.5 + 0.5;
+          s.drift = (Math.random() - 0.5) * 0.6;
+          s.alpha = Math.random() * 0.5 + 0.5;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
